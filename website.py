@@ -1,29 +1,39 @@
-import dash
+import pathlib
+from dash import Dash, dcc, html 
 from dash.dependencies import Input, Output
-import dash_core_components as dcc
-import dash_html_components as html
 import pandas as pd
-import plotly.graph_objs as go
+import plotly.express as px
+app = Dash(__name__)
+df = pd.read_csv("ICA2\datasets/vacDataClean.csv")
 
-app = dash.Dash()
-vacData = pd.read('datasets/vacData.csv')
-app.layout = html.Div(children=[
-    html.H1(children='Covid-19 Data'),
-    html.Div(children=''' '''),
-    dcc.Graph(
-        id='Vaccine',
-        figure={
-            'data': [
-                go.Bar(x = [1, 2, 3], y = [4, 1, 2], name ='Cherbourg'),
-                go.Bar(x = [1, 2, 3], y = [2, 4, 5], name = 'Queenstown'),
-                go.Bar(x = [1, 2, 3], y = [3, 2, 3], name = 'Southampton')
-            ],
-            'layout': {
-                'title': 'Vaccine coverage',
-                'x_axis':{'title': 'Region'},
-                'y_axis':{'title': 'Number of vaccinated people'}
-            }
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+fig = px.bar(df, x= 'YearWeek', y=['FirstDose','SecondDose'],barmode='group')
+
+fig.update_layout(
+    plot_bgcolor=colors['background'],
+    paper_bgcolor=colors['background'],
+    font_color=colors['text']
+)
+
+app.layout = html.Div(style={'backgroundColor': colors['background']},children=[
+    html.H1(
+        children='Covid-19 Vaccination and Transmission',
+        style={
+            'textAlign': 'center',
+            'color': colors['text']
         }
+        ),
+    
+    html.Div(children='''
+        C19 data
+    '''),
+    
+    dcc.Graph(
+        id = 'graph1',
+        figure = fig,
     )
 ])
 if __name__ == '__main__':
