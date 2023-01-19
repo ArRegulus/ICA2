@@ -1,15 +1,16 @@
 {
     "version": 2,
-    
-    "functions": {
-        "api/website.py": {
-          "memory": 128
+    "builds": [
+        {
+            "src": "website.py",
+            "use": "@vercel/python"
         }
-    },
+    ],
+    
     "routes": [
         {
-            "src": "api/website.py",
-            "dest": "api/website.py"
+            "src": "(.*)",
+            "dest": "website.py"
         }
     ]
   }
