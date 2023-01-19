@@ -1,6 +1,6 @@
 from dash import Dash, dcc, html, Input, Output
 from pandas import read_csv
-import plotly.graph_objects as go
+from plotly.graph_objects import Figure,Bar,Pie,Histogram
 
 app = Dash(__name__)
 #Datasets setup
@@ -19,9 +19,9 @@ colors = {
 
 #Figure Setup
 def pie_chart(labels,values,pieTitle): #Generates pie chart
-    figure = go.Figure(
+    figure = Figure(
             data=[
-                go.Pie(labels=labels,values=values)
+                Pie(labels=labels,values=values)
                 ],
             layout=dict(title=dict(text=pieTitle))
         )
@@ -46,10 +46,10 @@ def pie_chart(labels,values,pieTitle): #Generates pie chart
     return figure
 
 def bar_chart(x,y1,y2,xName,YName,barTitle):
-    figure = go.Figure(
+    figure = Figure(
             data=[
-                go.Bar(x=x, y= y1,name=xName,marker_color=colors['trace1']),
-                go.Bar(x=x, y= y2,name=YName,marker_color=colors['trace2'])
+                Bar(x=x, y= y1,name=xName,marker_color=colors['trace1']),
+                Bar(x=x, y= y2,name=YName,marker_color=colors['trace2'])
             ],
             layout=dict(title=dict(text=barTitle))
         )
@@ -109,10 +109,10 @@ app.layout = html.Div(children=[
 )
 def update_figure(graph_selector):
     if graph_selector == 'Vaccination by Year and Week': #generate Year Week vaccine histogram if selected in dropdown menu
-        fig = go.Figure(
+        fig = Figure(
             data=[
-                go.Histogram(x=vacData.YearWeek, y= vacData.FirstDose,name='First Dose',marker_color=colors['trace1']),
-                go.Histogram(x=vacData.YearWeek, y= vacData.SecondDose,name='Second Dose',marker_color=colors['trace2'])
+                Histogram(x=vacData.YearWeek, y= vacData.FirstDose,name='First Dose',marker_color=colors['trace1']),
+                Histogram(x=vacData.YearWeek, y= vacData.SecondDose,name='Second Dose',marker_color=colors['trace2'])
             ],
             layout=dict(title=dict(text='Vaccination by Year and Week'))
         )
