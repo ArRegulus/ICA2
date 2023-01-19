@@ -1,16 +1,9 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "website.py",
-            "use": "@vercel/python"
-        }
-    ],
-    
     "routes": [
         {
             "src": "(.*)",
-            "dest": "website.py"
+            "dest": "api/website.py"
         }
     ]
   }
