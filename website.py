@@ -19,40 +19,56 @@ colors = {
 }
 
 #Figure Setup
-pieColors = [
-    
-]
-pieChart = go.Figure(
-                    data=[
-                        go.Pie(labels=ERTotal.Countries,values=ERTotal.ReceivedTotal)
-                        ],
-                    layout=dict(title=dict(text='Doses Received by each countries :'))
+def pie_chart(labels,values,pieTitle): #Generates pie chart
+    figure = go.Figure(
+            data=[
+                go.Pie(labels=labels,values=values)
+                ],
+            layout=dict(title=dict(text=pieTitle))
         )
-pieChart.update_layout( #pie chart styling
-    plot_bgcolor=colors['background'],
-    paper_bgcolor=colors['background'],
-    font=dict(family='Century Gothic'),
-    font_color=colors['text'],
-    uniformtext_minsize=12, 
-    uniformtext_mode='hide',
-    title_x=0.5,
-    title_xanchor = 'center',
-    title_y=1,
-    title_yanchor = 'top',
-)
-pieChart.update_traces( #Pie chart display options
-    hoverinfo='label+percent', 
-    textinfo='label',
-    textposition='inside',
-    marker=dict(line=dict(color='#000000', width=2))
-)
+    figure.update_layout( #pie chart styling
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font=dict(family='Century Gothic'),
+        font_color=colors['text'],
+        uniformtext_minsize=12, 
+        uniformtext_mode='hide',
+        title_x=0.5,
+        title_xanchor = 'center',
+        title_y=1,
+        title_yanchor = 'top',
+    )
+    figure.update_traces( #Pie chart display options
+        hoverinfo='label+percent', 
+        textinfo='label',
+        textposition='inside',
+        marker=dict(line=dict(color='#000000', width=2))
+    )
+    return figure
 
+def bar_chart(x,y1,y2,xName,YName,barTitle):
+    figure = go.Figure(
+            data=[
+                go.Bar(x=x, y= y1,name=xName,marker_color=colors['trace1']),
+                go.Bar(x=x, y= y2,name=YName,marker_color=colors['trace2'])
+            ],
+            layout=dict(title=dict(text=barTitle))
+        )
+    figure.update_layout( #year graph layout
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font=dict(family='Century Gothic'),
+        font_color=colors['text'],
+        title_x=0.5,
+        title_xanchor = 'center'
+    )
+    return figure
 #App Layout
 app.layout = html.Div(children=[
     
     html.H1(
         className="app-header--title",
-        children='Covid-19 Vaccination and Transmission', # H1 Title
+        children='Covid-19 Vaccination', # H1 Title
         ),
     
     html.Div(className='dropdownMenu',children=[ # div for the dropdwn menu 
@@ -74,7 +90,6 @@ app.layout = html.Div(children=[
         ),
         dcc.Graph(
             id = 'pieChart',
-            figure=pieChart,
         ),
         dcc.RadioItems(
                         [
@@ -82,6 +97,7 @@ app.layout = html.Div(children=[
                             'Doses Exported',
                         ],
                         'Doses Received',
+                        id='pieRadio',
         ),
     ]),
     
@@ -90,18 +106,18 @@ app.layout = html.Div(children=[
 
 @app.callback( #Callback outputs the graph selected in input
     Output('graph','figure'),
-    Input('graph_selector','value')
+    Input('graph_selector','value'),
 )
 def update_figure(graph_selector):
     if graph_selector == 'Vaccination by Year and Week': #generate Year Week vaccine histogram if selected in dropdown menu
-        fig = vacYearFigure = go.Figure(
+        fig = go.Figure(
             data=[
                 go.Histogram(x=vacData.YearWeek, y= vacData.FirstDose,name='First Dose',marker_color=colors['trace1']),
                 go.Histogram(x=vacData.YearWeek, y= vacData.SecondDose,name='Second Dose',marker_color=colors['trace2'])
             ],
             layout=dict(title=dict(text='Vaccination by Year and Week'))
         )
-        vacYearFigure.update_layout( #year graph layout
+        fig.update_layout( #year graph layout
             plot_bgcolor=colors['background'],
             paper_bgcolor=colors['background'],
             font=dict(family='Century Gothic'),
@@ -111,40 +127,36 @@ def update_figure(graph_selector):
         )
         
     elif graph_selector == 'Vaccination by countries': #generate country vaccine histogram if selected in dropdown menu 
-        fig = vacCountryFigure = go.Figure(
-            data=[
-                go.Bar(x=countryTotal.Countries, y= countryTotal.FirstTotal,name='First Dose',marker_color=colors['trace1']),
-                go.Bar(x=countryTotal.Countries, y= countryTotal.SecondTotal,name='Second Dose',marker_color=colors['trace2'])
-            ],
-            layout=dict(title=dict(text='Vaccination by Countries'))
-        )
-        vacCountryFigure.update_layout( #country graph layout
-            plot_bgcolor=colors['background'],
-            paper_bgcolor=colors['background'],
-            font=dict(family='Century Gothic'),
-            font_color=colors['text'],
-            title_x=0.5,
-            title_xanchor = 'center'
-        )
+        fig = bar_chart(
+            countryTotal.Countries,
+            countryTotal.FirstTotal,
+            countryTotal.SecondTotal,
+            'First Dose',
+            'Second Dose',
+            'Vaccinations stats by countries'
+            )
     else: #generate total vaccine bar chart if selected in dropdown menu
-        fig = vacTotalFigure = go.Figure(
-            data=[
-                go.Bar(x = vacTotal.Vaccine, y = vacTotal.FirstTotal,name='First Dose',marker_color=colors['trace1']),
-                go.Bar(x = vacTotal.Vaccine, y = vacTotal.SecondTotal,name='Second Dose',marker_color=colors['trace2'])
-                ],
-            layout=dict(title=dict(text='Total of people vaccinated by each Vaccine :'))
-        )
-        vacTotalFigure.update_layout( #total graph layout
-            plot_bgcolor=colors['background'],
-            paper_bgcolor=colors['background'],
-            font=dict(family='Century Gothic'),
-            font_color=colors['text'],
-            title_x=0.5,
-            title_xanchor = 'center'
-        )
-        
+        fig = bar_chart(
+            vacTotal.Vaccine,
+            vacTotal.FirstTotal,
+            vacTotal.SecondTotal,
+            'First Dose',
+            'Second Dose',
+            'Total of people vaccinated with each vaccine'
+            )
         
     return fig
+@app.callback(
+    Output('pieChart','figure'),
+    Input('pieRadio','value'),
+)
+def update_pie(pieRadio):
+    if pieRadio == 'Doses Exported':
+        output = pie_chart(ERTotal.Countries,ERTotal.ExportedTotal,'Doses Exported by each countries :')
+    else:
+        output = pie_chart(ERTotal.Countries,ERTotal.ReceivedTotal,'Doses Received by each countries :')
+        
+    return output
 
 
 if __name__ == '__main__':
