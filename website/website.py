@@ -1,6 +1,5 @@
 from dash import Dash, dcc, html, Input, Output
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 
 app = Dash(__name__)
