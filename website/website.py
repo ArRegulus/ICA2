@@ -4,10 +4,10 @@ from plotly.graph_objects import Figure,Bar,Pie,Histogram
 
 app = Dash(__name__)
 #Datasets setup
-vacData = read_csv("../datasets/vacDataClean.csv") #Main dataframe w/ all vaccine data
-vacTotal = read_csv("../datasets/vacTotalData.csv")#Second dataframe w/ only total data
-countryTotal = read_csv("../datasets/totalCountry.csv")#Third dataframe w/ only country total data
-ERTotal = read_csv('../datasets/totalReceivedExported.csv')#4th dataframe w/ only exported and received doses by countries data
+vacData = read_csv("datasets/vacDataClean.csv") #Main dataframe w/ all vaccine data
+vacTotal = read_csv("datasets/vacTotalData.csv")#Second dataframe w/ only total data
+countryTotal = read_csv("datasets/totalCountry.csv")#Third dataframe w/ only country total data
+ERTotal = read_csv('datasets/totalReceivedExported.csv')#4th dataframe w/ only exported and received doses by countries data
 
 #Infile styling
 colors = {
